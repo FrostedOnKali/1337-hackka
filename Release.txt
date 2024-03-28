@@ -1,0 +1,7 @@
+Origin: 1337-hackka
+Label: 1337-hackka Repository
+Suite: 1337-hackka
+Codename: 1337-hackka
+Architectures: all
+Components: main
+Description: its a beta GUI hacking tool making it easier
