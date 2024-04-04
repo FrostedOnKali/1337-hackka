@@ -135,9 +135,6 @@ def execute_selected():
         os.system("sudo airmon-ng check kill")
         command = f"sudo airmon-ng start {hacker}"
         os.system("systemctl start NetworkManager")
-    elif selected_command == "guide":
-         print("these are just basic but why not shit lmao\n")
-         print("ap - Access points provides internet access in public places(aka its wifi)\n(the main file is ")
          
         
     subprocess.Popen(["xfce4-terminal", "--command", command])
