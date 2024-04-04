@@ -1,10 +1,94 @@
-import os
+import subprocess
 import tkinter as tk
-#made by FrostedFlakes666
-#this is v1.5 if it has bugs contact me at https://t.me/brainfuck1337
-#it only has aircrack on it atm will be adding more soon
-def run_command(command):
-    os.system(command)
+from tkinter import messagebox  # Add this import for messagebox
+import os
+
+
+def check_terminal():
+    try:
+        subprocess.run(["xfce4-terminal", "--version"], check=True)
+        return True  # Terminal is installed
+    except FileNotFoundError:
+        # xfce4-terminal is not installed, so install it
+        os.system("sudo apt update && sudo apt install -y xfce4-terminal")
+        return False  # Terminal is not installed and was just installed
+
+def show_info():
+    selected_command = command_listbox.get(tk.ACTIVE)
+    info_text = ""
+    
+    if selected_command == "checker":
+        info_text = """
+        Checker Command Information:
+        - Example:
+            BSSID:00:11:22:33:44:55
+            Channel: 6
+            Interface: wlan0mon
+            File Name: output.cap
+        """
+    elif selected_command == "deauth":
+        info_text = """
+        Deauthentication Attack
+        +It Sends Deauth Packets+
+        Packets: 0 for unli 
+        MainBssid: the main bssid you get from dump
+        ClientBssid: the client bssid you get from checker
+        Interface: wlan0mon
+        """
+    elif selected_command == "create ap":
+        info_text = """
+        Creation Of Access Points
+        +it creates access points(basically wifi)+
+        Name : whatever you want to name the network
+        Channel : can put 1 - 17
+        Interface: wlan0mon
+        """
+    elif selected_command == "dump bssid":#never fucking used this command should i remove it lmk in the discord ;)
+        info_text = """
+        Dumps bssid to a file 
+        +its dump but it just dumps to a file+
+        bssid: its like dump 
+        Interface: wlan0mon
+        Channel: 1 - 17
+        Filename : lol.pcap
+        """
+       
+    elif selected_command == "crack":
+        info_text = """
+        Wifi Cracker
+        +It Cracks the wifi .cap file with a pswd list+
+        password:any .txt .lst
+        """
+        
+    elif selected_command == "turn off":
+        info_text = """
+        Turn Off Command
+        +it turns off airmon aka aircrack+
+        Interface: wlan0mon
+        """
+        
+    elif selected_command == "turn on":
+        info_text = """
+        Turn On Commnd
+        +It turns on airmon for aircrack+
+        Interface: wlan0
+        """
+    elif selected_command == "turn onV2":
+        info_text = """
+        Turn OnV2 Commnd
+        +It turns on airmon for aircrack but its only used if you have 2 adapters+
+        Interface: custom
+        """
+        
+    elif selected_command == "dump":
+        info_text = """
+        Dump Command
+        +It Dumps aps Bssid (wifis)+
+        Interface: custom
+        """
+    if info_text:
+        tk.messagebox.showinfo("Command Information", info_text)
+
 
 def execute_selected():
     selected_command = command_listbox.get(tk.ACTIVE)
@@ -20,7 +104,7 @@ def execute_selected():
         mainmac = mainmac_entry.get()
         clientmac = clientmac_entry.get()
         inte2 = interface2_entry.get()
-        command = f"sudo aireplay-ng --deauth {packets} -a {mainmac} -c {clientmac} {inte2}"
+        command = f"sudo aireplay-ng --deauth {packets} -a {mainmac} -c {clientmac} {inte2}"    
     elif selected_command == "dump":
         inte3 = interface3_entry.get()
         command = f"sudo airodump-ng {inte3}"
@@ -45,18 +129,25 @@ def execute_selected():
         os.system("systemctl start NetworkManager")
     elif selected_command == "turn on":
         os.system("sudo airmon-ng check kill")
-        command = f"sudo airmon-ng start wlan0"
-    
-    run_command(command)
+        command = "sudo airmon-ng start wlan0"
+    elif selected_command == "turn onV2":
+        hacker = hacker_entry.get()
+        os.system("sudo airmon-ng check kill")
+        command = f"sudo airmon-ng start {hacker}"
+        os.system("systemctl start NetworkManager")
+    elif selected_command == "guide":
+         print("these are just basic but why not shit lmao\n")
+         print("ap - Access points provides internet access in public places(aka its wifi)\n(the main file is ")
+         
+        
+    subprocess.Popen(["xfce4-terminal", "--command", command])
 
 def toggle_widgets():
     selected_command = command_listbox.get(tk.ACTIVE)
     
-    # Hide all widgets
     for widget in all_widgets:
         widget.pack_forget()
 
-    # Show relevant widgets based on selected command
     if selected_command == "checker":
         bssid_label.pack()
         bssid_entry.pack()
@@ -102,33 +193,35 @@ def toggle_widgets():
     elif selected_command in ["turn off", "turn on"]:
         inte5_label.pack()
         inte5_entry.pack()
+    elif selected_command == "turn onV2":
+        hacker_label.pack()
+        hacker_entry.pack()
 
-# Create the root window
 root = tk.Tk()
-root.title("Frosted Flakes Kali Script v1.5")
+root.title("Frosted Flakes Kali Script Gui v1.6")
 
-# List of commands
-commands = ["checker", "deauth", "dump", "create ap", "dump bssid", "crack", "turn off", "turn on"]
+commands = ["checker", "deauth", "dump", "create ap", "dump bssid", "crack", "turn off", "turn on","turn onV2"]
 
-# Frame to hold command listbox and select button
 command_frame = tk.Frame(root)
 command_frame.pack()
 
-# Label for command selection
 command_label = tk.Label(command_frame, text="Select a command:")
 command_label.pack()
 
-# Listbox to display commands
 command_listbox = tk.Listbox(command_frame, height=len(commands))
 for command in commands:
     command_listbox.insert(tk.END, command)
 command_listbox.pack(side=tk.LEFT)
 
-# Button to trigger command selection
+info_button = tk.Button(command_frame, text="Information", command=show_info)
+info_button.pack(side=tk.LEFT)
+
 select_button = tk.Button(command_frame, text="Select", command=toggle_widgets)
 select_button.pack(side=tk.LEFT)
 
-# Entry fields for command parameters
+# Initialize the terminal check
+terminal_installed = check_terminal()
+
 bssid_label = tk.Label(root, text="BSSID:")
 bssid_entry = tk.Entry(root)
 
@@ -186,8 +279,9 @@ inte4_entry = tk.Entry(root)
 inte5_label = tk.Label(root, text="Interface:")
 inte5_entry = tk.Entry(root)
 
+hacker_label = tk.Label(root, text="Interface:")
+hacker_entry = tk.Entry(root)
 
-# List of all widgets for easy management
 all_widgets = [
     bssid_label, bssid_entry, channel_label, channel_entry, interface_label, interface_entry,
     filename_label, filename_entry, packets_label, packets_entry, mainmac_label, mainmac_entry,
@@ -195,14 +289,12 @@ all_widgets = [
     interface3_entry, nig3_label, nig3_entry, passfile_label, passfile_entry, bssidd_label,
     bssidd_entry, inte7_label, inte7_entry, channel123_label, channel123_entry, filesave_label,
     filesave_entry, name_label, name_entry, channel2_label, channel2_entry, inte4_label,
-    inte4_entry, inte5_label, inte5_entry
+    inte4_entry, inte5_label, inte5_entry, hacker_label,hacker_entry
 ]
 
-# Button to execute the command
 execute_button = tk.Button(root, text="Execute", command=execute_selected)
 execute_button.pack()
 
-# Adjusting window size to make it more rectangular
 window_width = 600
 window_height = 400
 screen_width = root.winfo_screenwidth()
@@ -211,5 +303,4 @@ x_coordinate = (screen_width / 2) - (window_width / 2)
 y_coordinate = (screen_height / 2) - (window_height / 2)
 root.geometry("%dx%d+%d+%d" % (window_width, window_height, x_coordinate, y_coordinate))
 
-# Start the main event loop
 root.mainloop()
